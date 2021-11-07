@@ -13,4 +13,4 @@ Sovelluksen perusversioon on odotettavissa seuraavat toiminnallisuudet:
 * Käyttäjä voi poistaa ja muokata kategorioita, aktiviteetteja ja niihin liittyviä suorituksia
 * Käyttäjä voi tarkastella ajankäytöstään koostettuja yhteenvetoja
 * Käyttäjä voi seurata sekä kategoriaan että siihen liittyviin aktiviteetteihin käyttämäänsä aikaa valitsemillaan ajanjaksoilla (päivä, viikko, kuukausi)
-  * Käyttäjä voisi esimerkiksi nähdä, kuinka kauan aikaa viime viikolla on mennyt opiskeluun (kategoria) ja kuinka kauan siitä on kulunut tsoha-kurssiin tai matematiikkaan (aktiviteetit)
+  * Käyttäjä voisi esimerkiksi nähdä, kuinka kauan aikaa viime viikolla on mennyt opiskeluun (kategoria) ja kuinka kauan siitä kului tsoha-kurssiin tai matematiikkaan (aktiviteetit)
