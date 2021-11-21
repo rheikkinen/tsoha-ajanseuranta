@@ -1,0 +1,8 @@
+<a href="/new-activity">Lisää aktiviteetti</a>
+{% for activity in activities %}
+<hr>
+{{ activity.name }} <br>
+{{ activity.totaltime }} <br>
+<a href="/activity-entry">Lisää suoritus</a>
+<hr>
+{% endfor %}
