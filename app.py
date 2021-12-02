@@ -5,6 +5,7 @@ from os import getenv
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 @app.route("/")
@@ -15,7 +16,7 @@ def index():
     return render_template("index.html", activities=activities)
 
 @app.route("/new-activity")
-def newactivity():
+def new_activity():
     return render_template("new-activity.html")
 
 @app.route("/create-activity", methods=["POST"])
@@ -26,10 +27,40 @@ def create_activity():
     db.session.commit()
     return redirect("/")
 
-#@app.route("/activity-entry", methods=["POST"])
-#def activityentry():
-#    return render_template("activity-entry.html")
+@app.route("/activity-entry/<int:id>")
+def activity_entry(id):
+    sql = "SELECT name FROM activities WHERE id=:id"
+    result = db.session.execute(sql, {"id":id})
+    name = result.fetchone()[0]
+    return render_template("activity-entry.html", name=name, id=id)
 
+@app.route("/add-entry", methods=["POST"])
 def add_entry():
-    pass
+    # get datetimes from the form
+    start_time = request.form["starttime"]
+    end_time = request.form["endtime"]
+    # handle invalid datetimes here
+    # ...
+    
+    # get the id of the corresponding activity
+    activity_id = int(request.form["id"])
 
+    # convert datetime strings to SQL timestamp format
+    sql = "SELECT to_timestamp(:start_time, 'YYYY-MM-DD THH24H:MI')"
+    result = db.session.execute(sql, {"start_time":start_time})
+    start_timestamp = result.fetchone()[0]
+    sql = "SELECT to_timestamp(:end_time, 'YYYY-MM-DD THH24H:MI')"
+    result = db.session.execute(sql, {"end_time":end_time})
+    end_timestamp = result.fetchone()[0]
+    
+    # insert an entry with the activity_id and the timestamps into database
+    sql = "INSERT INTO entries (activity_id, start, stop) values " \
+          "(:activity_id, :start_timestamp, :end_timestamp)"
+    result = db.session.execute(sql, {"activity_id":activity_id, "start_timestamp":start_timestamp, "end_timestamp":end_timestamp})
+
+    # update the total time spent on the corresponding activity
+    sql = "UPDATE activities SET totaltime = totaltime + (:end_timestamp - :start_timestamp) WHERE id=:activity_id"
+    result = db.session.execute(sql, {"activity_id":activity_id, "end_timestamp":end_timestamp, "start_timestamp":start_timestamp})
+    # commit changes
+    db.session.commit()
+    return redirect("/")
