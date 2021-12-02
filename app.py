@@ -39,9 +39,13 @@ def add_entry():
     # get datetimes from the form
     start_time = request.form["starttime"]
     end_time = request.form["endtime"]
-    # handle invalid datetimes here
-    # ...
     
+    # check validity of submitted datetimes
+    if start_time == "" or end_time == "":
+        return render_template("error.html", error="Suoritukselle täytyy valita aloitus- ja päättymisaika!")
+    if start_time >= end_time:
+        return render_template("error.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!")
+
     # get the id of the corresponding activity
     activity_id = int(request.form["id"])
 
