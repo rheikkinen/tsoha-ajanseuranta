@@ -1,8 +1,20 @@
+{% if session.user_id %}
 <a href="/new-activity">Lisää aktiviteetti</a>
 {% for activity in activities %}
 <hr>
 {{ activity.name }} <br>
 {{ activity.totaltime }} <br>
-<a href="/activity-entry/{{ activity.id }}">Lisää suoritus</a>
+<a href="/{{ activity.id }}/activity-entry">Lisää suoritus</a>
 <hr>
 {% endfor %}
+<a href="/logout">Kirjaudu ulos</a>
+{% else %}
+<h2>Ajanseurantasovellus</h2>
+Kirjaudu sisään käyttääksesi sovellusta:<hr>
+<form action="/login" method="POST">
+<p>Tunnus:<br><input type="text" name="username"></p>
+<p>Salasana:<br><input type="password" name="password"></p>
+<input type="submit" value="Kirjaudu sisään">
+</form>
+<p>Jos sinulla ei ole käyttäjätunnusta, voit luoda tunnuksen <a href="/new-user">täällä</a>.</p>
+{% endif %}
