@@ -11,7 +11,7 @@ app.secret_key = getenv("SECRET_KEY")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-# The route for the main page
+# Route for the main page
 @app.route("/")
 def index():
     # Login check
@@ -52,7 +52,7 @@ def logout():
     del session["user_id"]
     return redirect("/")
 
-# Return a form where user can register
+# Route for the form where user can register
 @app.route("/new-user")
 def new_user():
     return render_template("new-user.html")
@@ -79,10 +79,11 @@ def add_user():
         except:
             return render_template("error.html", error="Tunnuksen luonti epäonnistui.")
     return redirect("/")
-
-# Return a form where user can create a new activity to track
+    
+# Route for the form where user can create a new activity to track
 @app.route("/new-activity")
 def new_activity():
+    # Login check
     try:
         user_id = session["user_id"]
     except:
@@ -101,8 +102,22 @@ def create_activity():
     db.session.commit()
     # Return to main page
     return redirect("/")
+    
+# Route for the activity page
+@app.route("/<int:id>/<activity_name>")
+def show_info(id, activity_name):
+    # Login check
+    try:
+        user_id = session["user_id"]
+    except:
+        return render_template("error.html", error="Et ole kirjautunut sisään!")   
+    # Get the entries' start and end times, end date and length in minutes
+    sql = "SELECT id, to_char(start, 'HH24:MI') AS start_time, to_char(stop, 'HH24:MI') AS end_time, to_char(stop, 'FMDD.FMMM.YYYY') AS date, floor(EXTRACT(EPOCH FROM (stop - start)))::integer/60 AS length FROM entries WHERE activity_id=:id ORDER BY stop DESC"
+    result = db.session.execute(sql, {"id":id})
+    entries = result.fetchall()
+    return render_template("activity.html", entries=entries, activity_name=activity_name)
 
-# Route for the form where user can add a time entry for a particular activity
+# Route for the form where the user can add a time entry for a particular activity
 @app.route("/<int:id>/activity-entry")
 def activity_entry(id):
     # Login check
@@ -114,8 +129,6 @@ def activity_entry(id):
     sql = "SELECT user_id FROM activities WHERE id=:id"
     result = db.session.execute(sql, {"id":id})
     owner_id = result.fetchone()[0]
-    print("Kirjautuneen käyttäjän id on", user_id, type(user_id)) #POISTA!!!!!!!!!!!!!!!!!
-    print("Aktiviteetin user_id on", owner_id, type(owner_id)) #POISTA!!!!!!!!!!!!!!!!!!!!
     if user_id != owner_id:
         return render_template("error.html", error="Sinulla ei ole oikeutta nähdä tätä sivua.")
     # Get the name of the activity from the database
@@ -155,4 +168,33 @@ def add_entry():
     # Commit changes
     db.session.commit()
     # Return to main page
+    return redirect("/")
+    
+# Route for the page where user can edit and delete an entry
+@app.route("/<int:entry_id>/edit-entry")
+def edit_entry(entry_id):
+    return render_template("edit-entry.html", entry_id=entry_id)
+    
+# Function for deleting an activity entry
+@app.route("/delete-entry", methods=["POST"])
+def delete_entry():
+    entry_id = request.form["entry_id"]
+    # Get the id of the corresponding activity
+    sql = "SELECT activity_id FROM entries WHERE id=:entry_id"
+    result = db.session.execute(sql, {"entry_id":entry_id})
+    activity_id = result.fetchone()[0]
+    # Get the length of the entry being deleted 
+    sql = "SELECT (stop - start) AS length FROM entries WHERE id=:entry_id"
+    result = db.session.execute(sql, {"entry_id":entry_id})
+    length = result.fetchone()[0]
+    try:
+        sql = "DELETE FROM entries WHERE id=:entry_id"
+        result = db.session.execute(sql, {"entry_id":entry_id})
+        db.session.commit()
+        # Substract the length of the deleted entry from the activity's totaltime
+        sql = "UPDATE activities SET totaltime = totaltime - :length WHERE id=:activity_id"
+        result = db.session.execute(sql, {"length":length, "activity_id":activity_id})
+        db.session.commit()
+    except:
+        return render_template("error.html", error="Aktiviteetin poistaminen ei onnistunut.")
     return redirect("/")

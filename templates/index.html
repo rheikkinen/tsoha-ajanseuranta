@@ -1,12 +1,13 @@
 {% if session.user_id %}
-<a href="/new-activity">Lisää aktiviteetti</a>
+<a href="/new-activity">Luo uusi aktiviteetti</a>
 {% for activity in activities %}
 <hr>
-{{ activity.name }} <br>
+{{ activity.name }}<br>
 {{ activity.totaltime }} <br>
-<a href="/{{ activity.id }}/activity-entry">Lisää suoritus</a>
+<a href="/{{ activity.id }}/{{ activity.name }}">Lisätiedot</a> | <a href="/{{ activity.id }}/activity-entry">Lisää suoritus</a>
 <hr>
 {% endfor %}
+<hr>
 <a href="/logout">Kirjaudu ulos</a>
 {% else %}
 <h2>Ajanseurantasovellus</h2>

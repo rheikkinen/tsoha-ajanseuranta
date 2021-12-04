@@ -1,0 +1,10 @@
+<h2> {{ activity_name }} </h2>
+<hr>
+{% for entry in entries %}
+<b>{{ entry.date }}</b><br>
+{{ entry.start_time }} - {{ entry.end_time }} | <b>{{ entry.length }} min</b> <br>
+<a href="/{{ entry.id }}/edit-entry">Poista suoritus</a>
+<hr>
+{% endfor %}
+<hr>
+<a href="/">Palaa etusivulle</a>
