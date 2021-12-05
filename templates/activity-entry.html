@@ -1,10 +1,10 @@
 <h2> {{ name }} </h2>
 <form action="/add-entry" method="POST">
 <p>Valitse suorituksen alkamis- ja päättymisaika. <br>
-<br>Start: <input type="datetime-local" name="starttime"></p>
+<br>Start: <input type="datetime-local" name="starttime" min="2021-10-01T00:00"></p>
 <p>End: <input type="datetime-local" name="endtime"></p>
 <input type="submit" value="Lisää suoritus">
 <input type="hidden" name="id" value="{{ id }}">
 </form>
 <hr>
-<a href="/">Takaisin etusivulle</a>
+<a href="/">Palaa etusivulle</a>

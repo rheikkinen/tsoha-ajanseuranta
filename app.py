@@ -66,6 +66,12 @@ def add_user():
     # Check validity of the submitted username and password(s)
     if username == "" or password == "":
         return render_template("error.html", error="Käyttäjätunnus ja salasana eivät saa olla tyhjät.")
+    if len(username) > 50:
+        return render_template("error.html", error="Käyttäjätunnus on liian pitkä! (Max 50 merkkiä)")
+    if len(password) < 6:
+        return render_template("error.html", error="Salasanassa on oltava vähintään 6 merkkiä.")
+    if len(password) > 100:
+        return render_template("error.html", error="Salasana on liian pitkä.")
     if password != password2:
         return render_template("error.html", error="Salasanat eivät täsmää!")
     else:
@@ -96,6 +102,8 @@ def create_activity():
     user_id = session["user_id"]
     # Get the name of the activity from the form    
     name = request.form["name"]
+    if len(name) > 30 or name == "":
+        return render_template("error.html", error="Aktiviteetin nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä.")
     # Add the activity into the database with initial totaltime 0:00:00
     sql = "INSERT INTO activities (user_id, name, totaltime) values (:user_id, :name, NOW() - NOW())"
     result = db.session.execute(sql, {"user_id":user_id, "name":name})
@@ -103,19 +111,25 @@ def create_activity():
     # Return to main page
     return redirect("/")
     
-# Route for the activity page
+# Route for the activity's info page
 @app.route("/<int:id>/<activity_name>")
 def show_info(id, activity_name):
     # Login check
     try:
         user_id = session["user_id"]
     except:
-        return render_template("error.html", error="Et ole kirjautunut sisään!")   
+        return render_template("error.html", error="Et ole kirjautunut sisään!")  
+    # Check that the logged-in user is the creator of this activity
+    sql = "SELECT user_id FROM activities WHERE id=:id"
+    result = db.session.execute(sql, {"id":id})
+    owner_id = result.fetchone()[0]
+    if user_id != owner_id:
+        return render_template("error.html", error="Sinulla ei ole oikeutta nähdä tätä sivua.")
     # Get the entries' start and end times, end date and length in minutes
     sql = "SELECT id, to_char(start, 'HH24:MI') AS start_time, to_char(stop, 'HH24:MI') AS end_time, to_char(stop, 'FMDD.FMMM.YYYY') AS date, floor(EXTRACT(EPOCH FROM (stop - start)))::integer/60 AS length FROM entries WHERE activity_id=:id ORDER BY stop DESC"
     result = db.session.execute(sql, {"id":id})
     entries = result.fetchall()
-    return render_template("activity.html", entries=entries, activity_name=activity_name)
+    return render_template("activity.html", entries=entries, activity_name=activity_name, activity_id=id)
 
 # Route for the form where the user can add a time entry for a particular activity
 @app.route("/<int:id>/activity-entry")
@@ -158,6 +172,12 @@ def add_entry():
     sql = "SELECT to_timestamp(:end_time, 'YYYY-MM-DD THH24H:MI')"
     result = db.session.execute(sql, {"end_time":end_time})
     end_timestamp = result.fetchone()[0]
+    # Limit the max length of the entry to 24 hours
+    sql = "SELECT EXTRACT(EPOCH FROM (:end_timestamp - :start_timestamp))::integer AS length"
+    result = db.session.execute(sql, {"end_timestamp":end_timestamp, "start_timestamp":start_timestamp})
+    length = result.fetchone()[0] # length in seconds
+    if length > 86400:
+        return render_template("error.html", error="Suorituksen maksimipituus on rajattu 24 tuntiin.")
     # Insert an entry with the activity_id and the timestamps into database
     sql = "INSERT INTO entries (activity_id, start, stop) values " \
           "(:activity_id, :start_timestamp, :end_timestamp)"
@@ -171,8 +191,23 @@ def add_entry():
     return redirect("/")
     
 # Route for the page where user can edit and delete an entry
-@app.route("/<int:entry_id>/edit-entry")
-def edit_entry(entry_id):
+@app.route("/<int:activity_id>/<activity_name>/<int:entry_id>/edit-entry")
+def edit_entry(activity_id, activity_name, entry_id):
+    # Login check
+    try:
+        user_id = session["user_id"]
+    except:
+        return render_template("error.html", error="Et ole kirjautunut sisään!")
+    # Check that the logged-in user is the creator of the entry
+    sql = "SELECT user_id FROM activities WHERE id=:activity_id"
+    result = db.session.execute(sql, {"activity_id":activity_id})
+    owner_id = result.fetchone()[0]
+    sql = "SELECT activity_id FROM entries WHERE id=:entry_id"
+    result = db.session.execute(sql, {"entry_id":entry_id})
+    valid_activity_id = result.fetchone()[0]
+    if user_id != owner_id or activity_id != valid_activity_id:
+        return render_template("error.html", error="Sinulla ei ole oikeutta nähdä tätä sivua.")
+        
     return render_template("edit-entry.html", entry_id=entry_id)
     
 # Function for deleting an activity entry
