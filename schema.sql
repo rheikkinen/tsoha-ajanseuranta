@@ -6,6 +6,7 @@ CREATE TABLE users (
 
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users,
     name TEXT
 );
 
