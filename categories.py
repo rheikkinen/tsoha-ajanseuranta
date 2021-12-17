@@ -10,3 +10,10 @@ def create(name):
 	result = db.session.execute(sql, {"user_id":user_id, "name":name})
 	db.session.commit()
 	return True
+	
+def get_list():
+	"""Get list of the categories created by the user"""
+	user_id = users.user_id()
+	sql = "SELECT id, name FROM categories WHERE user_id=:user_id"
+	result = db.session.execute(sql, {"user_id":user_id})
+	return result.fetchall()

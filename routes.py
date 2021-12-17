@@ -73,7 +73,8 @@ def create_category():
 def new_activity():
 	# Login check
 	if users.user_id() != 0:
-		return render_template("new-activity.html")
+		list = categories.get_list()
+		return render_template("new-activity.html", categories=list)
 	else:
 		return redirect("/")
 
@@ -86,7 +87,11 @@ def create_activity():
 	name = request.form["name"]
 	if len(name) > 30 or name == "":
 		return render_template("error.html", error="Aktiviteetin nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä.")
-	activities.create(name)
+	category_id = request.form["category"]
+	if category_id == "default":
+		activities.create(name, 0)
+	else:
+		activities.create(name, category_id)
 	return redirect("/")
     
 # Route for the activity's info page
