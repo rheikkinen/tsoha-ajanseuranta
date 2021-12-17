@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, request, redirect, abort
-import users, activities, entries
+import users, categories, activities, entries
 
 @app.route("/")
 def index():
@@ -46,7 +46,28 @@ def add_user():
 		return redirect("/")
 	else:
 		return render_template("error.html", error="Käyttäjätilin luominen ei onnistunut.")
-    
+
+@app.route("/new-category")
+def new_category():
+	# Login check
+	if users.user_id() != 0:
+		return render_template("new-category.html")
+	else:
+		print("Sinun on kirjauduttava sisään!")
+		return redirect("/")
+
+@app.route("/create-category", methods=["POST"])
+def create_category():
+	csrf_token = request.form["csrf_token"]
+	if not users.check(csrf_token):
+		abort(403)
+	name = request.form["name"]
+	if len(name) > 30 or name == "":
+		# TODO: error message
+		pass
+	categories.create(name)
+	return redirect("/")
+	
 # Route for the form where user can create a new activity to track
 @app.route("/new-activity")
 def new_activity():

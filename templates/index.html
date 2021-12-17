@@ -1,6 +1,6 @@
 {% if session.user_id %}
 <h2>Ajanseurantasovellus</h2>
-<a href="/new-activity">Luo uusi aktiviteetti</a>
+<a href="/new-category">Luo kategoria</a> <a href="/new-activity">Uusi aktiviteetti</a>
 {% for activity in activities %}
 <hr>
 {{ activity.name }}<br>

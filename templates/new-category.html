@@ -1,0 +1,7 @@
+<title>Uusi kategoria</title>
+<form action="/create-category", method="POST">
+	<p>Kategorian nimi:</p>
+	<input type="text" name="name">
+	<input type="submit" value="Luo">
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
