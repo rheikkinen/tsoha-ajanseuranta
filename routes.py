@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, abort
 import users, activities, entries
 
 @app.route("/")
@@ -50,10 +50,17 @@ def add_user():
 # Route for the form where user can create a new activity to track
 @app.route("/new-activity")
 def new_activity():
-	return render_template("new-activity.html")
+	# Login check
+	if users.user_id() != 0:
+		return render_template("new-activity.html")
+	else:
+		return redirect("/")
 
 @app.route("/create-activity", methods=["POST"])
 def create_activity():
+	csrf_token = request.form["csrf_token"]
+	if not users.check(csrf_token):
+		abort(403)
 	# Get the name of the activity from the form    
 	name = request.form["name"]
 	if len(name) > 30 or name == "":
@@ -62,25 +69,34 @@ def create_activity():
 	return redirect("/")
     
 # Route for the activity's info page
-@app.route("/<int:id>/<activity_name>")
-def show_info(id, activity_name):
-    # Check that the logged-in user is the creator of this activity
-	if not activities.owner(id):
-		return render_template("error.html", error="Sinulla ei ole oikeutta nähdä tätä sivua.")
-	list = entries.get_list(id)
-	return render_template("activity.html", entries=list, activity_name=activity_name, activity_id=id)
+@app.route("/activity/<activity_name>", methods=["POST", "GET"])
+def show_info(activity_name):
+	if request.method == "POST":
+		activity_id = request.form["a_id"]
+		# Check that the user is the owner of the activity
+		if activities.owner(activity_id):
+			list = entries.get_list(activity_id)
+			return render_template("activity.html", entries=list, activity_name=activity_name, activity_id=activity_id)
+		else:
+			return redirect("/")
+	else:
+		return redirect("/")
 
 # Route for the form where the user can add a time entry for a particular activity
-@app.route("/<int:id>/activity-entry")
-def activity_entry(id):
-	if not activities.owner(id):
-		return render_template("error.html", error="Sinulla ei ole oikeutta nähdä tätä sivua.")
-    # Get the name of the activity from the database
-	name = activities.get_name(id)
-	return render_template("activity-entry.html", name=name, id=id)
+@app.route("/new-entry", methods=["POST", "GET"])
+def activity_entry():
+	# Login check
+	if users.user_id() != 0:
+		name = request.form["a_name"]
+		activity_id = request.form["a_id"]
+		return render_template("activity-entry.html", name=name, activity_id=activity_id)
+	else:
+		return redirect("/")
 
 @app.route("/add-entry", methods=["POST"])
 def add_entry():
+	if not users.check(request.form["csrf_token"]):
+		abort(403)
     # Get datetimes from the form
 	start_time = request.form["starttime"]
 	end_time = request.form["endtime"]
@@ -96,19 +112,21 @@ def add_entry():
 	return redirect("/")
     
 # Route for the page where user can edit and delete an entry
-@app.route("/<int:activity_id>/<activity_name>/<int:entry_id>/edit-entry")
-def edit_entry(activity_id, activity_name, entry_id):
-    # Check that the logged-in user is the creator of the entry
-	if not entries.owner(entry_id):
-		return render_template("error.html", error="Sinulla ei ole oikeutta nähdä tätä sivua.")
+@app.route("/edit-entry", methods=["POST"])
+def edit_entry():
+	entry_id = request.form["e_id"]
+	csrf_token = request.form["csrf_token"]
+	if not users.check(csrf_token) or not entries.owner(entry_id):
+		abort(403)
 	return render_template("edit-entry.html", entry_id=entry_id)
-    
+
 @app.route("/delete-entry", methods=["POST"])
 def delete_entry():
-	entry_id = request.form["entry_id"]
-	print("Poistettavan entryn id =", entry_id)
+	entry_id = request.form["e_id"]
+	csrf_token = request.form["csrf_token"]
+	if not users.check(csrf_token) or not entries.owner(entry_id):
+		abort(403)
 	activity_id = entries.activity_id(entry_id)
-	print("activity_id =", activity_id)
 	if not entries.delete(entry_id, activity_id):
 		return render_template("error.html", error="Suorituksen poistaminen ei onnistunut.")
 	return redirect("/")

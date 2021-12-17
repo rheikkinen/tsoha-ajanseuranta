@@ -5,7 +5,17 @@
 <hr>
 {{ activity.name }}<br>
 {{ activity.totaltime }} <br>
-<a href="/{{ activity.id }}/{{ activity.name }}">Lisätiedot</a> | <a href="/{{ activity.id }}/activity-entry">Lisää suoritus</a>
+<br>
+
+<form action="/activity/{{ activity.name }}" method="POST">
+	<input type="submit" value="Tiedot">
+	<input type="hidden" name="a_id" value="{{ activity.id }}">
+</form>
+<form action="/new-entry" method="POST">
+	<input type="submit" value="Lisää suoritus">
+	<input type="hidden" name="a_id" value="{{ activity.id }}">
+	<input type="hidden" name="a_name" value="{{ activity.name }}">
+</form>
 <hr>
 {% endfor %}
 <hr>
@@ -14,9 +24,11 @@
 <h2>Ajanseurantasovellus</h2>
 Kirjaudu sisään käyttääksesi sovellusta:<hr>
 <form action="/login" method="POST">
-<p>Tunnus:<br><input type="text" name="username"></p>
-<p>Salasana:<br><input type="password" name="password"></p>
-<input type="submit" value="Kirjaudu sisään">
+	<p>Tunnus:<br>
+	<input type="text" name="username"></p>
+	<p>Salasana:<br>
+	<input type="password" name="password"></p>
+	<input type="submit" value="Kirjaudu sisään">
 </form>
 <p>Jos sinulla ei ole käyttäjätunnusta, voit luoda tunnuksen <a href="/new-user">täällä</a>.</p>
 {% endif %}

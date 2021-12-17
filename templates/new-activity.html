@@ -1,10 +1,11 @@
 <h2>Uusi aktiviteetti</h2>
-Tällä sivulla voit lisätä uuden aktiviteetin, johon käytettyä aikaa haluat seurata.
+Tällä sivulla voit lisätä uuden aktiviteetin, jota haluat seurata.
 <hr>
 <form action="/create-activity" method="POST">
-<p>Aktiviteetin nimi: <br>
-<input type="text" name="name"></p>
-<input type="submit" value="OK">
+	<p>Aktiviteetin nimi: <br>
+	<input type="text" name="name"></p>
+	<input type="submit" value="OK">
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 <hr>
 <a href="/">Palaa etusivulle</a>

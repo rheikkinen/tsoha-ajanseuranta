@@ -35,10 +35,10 @@ def delete(entry_id, activity_id):
 	
 def owner(entry_id):
 	user_id = users.user_id()
-	sql = "SELECT activity_id FROM entries WHERE id=:entry_id"
+	sql = "SELECT user_id FROM activities A JOIN entries E ON E.activity_id=A.id WHERE E.id=:entry_id"
 	result = db.session.execute(sql, {"entry_id":entry_id})
-	activity_id = result.fetchone()[0]
-	return activities.owner(activity_id)
+	owner_id = result.fetchone()[0]
+	return user_id == owner_id
 	
 def activity_id(entry_id):
 	sql = "SELECT activity_id FROM entries WHERE id=:entry_id"

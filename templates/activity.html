@@ -2,9 +2,15 @@
 <hr>
 <p>Suoritukset:</p>
 {% for entry in entries %}
-<b>{{ entry.date }}</b><br>
-{{ entry.start_time }} - {{ entry.end_time }} | <b>{{ entry.length }} min</b> <br>
-<a href="/{{ activity_id }}/{{ activity_name }}/{{ entry.id }}/edit-entry">Poista suoritus</a>
+<p><b>{{ entry.date }}</b><br>
+{{ entry.start_time }} - {{ entry.end_time }} | <b>{{ entry.length }} min</b></p>
+<form action="/edit-entry" method="POST">
+	<input type="submit" value="Muokkaa">
+	<input type="hidden" name="a_name" value="{{ activity_name }}">
+	<input type="hidden" name="a_id" value="{{ activity_id }}">
+	<input type="hidden" name="e_id" value="{{ entry.id }}">
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
 <hr>
 {% endfor %}
 <hr>

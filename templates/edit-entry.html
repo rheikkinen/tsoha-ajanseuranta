@@ -1,5 +1,6 @@
 <form action="/delete-entry" method="POST">
-<p>Oletko varma, että haluat poistaa suorituksen?</p>
-<input type="submit" value="Poista">
-<input type="hidden" name="entry_id" value="{{ entry_id }}">
+	<p>Oletko varma, että haluat poistaa suorituksen?</p>
+	<input type="submit" value="Poista">
+	<input type="hidden" name="e_id" value="{{ entry_id }}">
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
