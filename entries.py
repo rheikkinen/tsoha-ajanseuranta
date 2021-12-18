@@ -8,9 +8,16 @@ def get_list(activity_id):
     	  "FROM entries WHERE activity_id=:activity_id ORDER BY stop DESC"
 	result = db.session.execute(sql, {"activity_id":activity_id})
 	return result.fetchall()
+	
+def get_times(entry_id):
+	# Get entry's start and end time as datetime strings
+	sql = """SELECT to_char(start, 'YYYY-MM-DD"T"HH24:MI') AS start_time,
+		  to_char(stop, 'YYYY-MM-DD"T"HH24:MI') AS end_time
+		  FROM entries WHERE id=:entry_id"""
+	result = db.session.execute(sql, {"entry_id":entry_id})
+	return result.fetchone()
 
-def add_entry(activity_id, start, end):
-	user_id = users.user_id()
+def new(activity_id, start, end):
 	start_time = to_timestamp(start)
 	end_time = to_timestamp(end)
 	# Add entry to the database
@@ -18,6 +25,18 @@ def add_entry(activity_id, start, end):
 		sql = "INSERT INTO entries (activity_id, start, stop) values " \
           "(:activity_id, :start_time, :end_time) RETURNING (stop - start) AS length"
 		result = db.session.execute(sql, {"activity_id":activity_id, "start_time":start_time, "end_time":end_time})
+		db.session.commit()
+		return True
+	except:
+		return False
+		
+def update(entry_id, start, end):
+	start_time = to_timestamp(start)
+	end_time = to_timestamp(end)
+	# Try to update the start and end time of the entry
+	try:
+		sql = "UPDATE entries SET start = :start_time, stop = :end_time WHERE id=:entry_id"
+		result = db.session.execute(sql, {"entry_id":entry_id, "start_time":start_time, "end_time":end_time})
 		db.session.commit()
 		return True
 	except:

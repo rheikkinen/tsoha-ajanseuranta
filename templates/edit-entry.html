@@ -2,13 +2,23 @@
 {% block title %}Muokkaa suoritusta{% endblock %}
 {% block heading %}Suorituksen muokkaus{% endblock %}
 {% block info %}
-Tällä hetkellä voit ainoastaan poistaa suorituksen.
+Voit muuttaa suorituksen aloitus- ja päättymisaikaa tai poistaa suorituksen.
 {% endblock %}
 {% block content %}
-<form action="/delete-entry" method="POST">
-	<p>Oletko varma, että haluat poistaa suorituksen?</p>
-	<input type="submit" value="Poista">
-	<input type="hidden" name="e_id" value="{{ entry_id }}">
-	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-</form>
+<p>Muokkaa aikoja:</p>
+	<form action="/update-entry" method="POST">
+		<p>Start: <input type="datetime-local" name="starttime" value="{{ entry.start_time }}" min="2021-10-01T00:00"></p>
+		<p>End: <input type="datetime-local" name="endtime" value="{{ entry.end_time }}"></p>
+		<input type="submit" value="Hyväksy">
+		<input type="hidden" name="e_id" value="{{ entry_id }}">
+		<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+	</form>
+<hr>
+<p>Poista suoritus:</p>
+	<form action="/delete-entry" method="POST">
+		<p>Oletko varma, että haluat poistaa suorituksen?</p>
+		<input type="submit" value="Poista">
+		<input type="hidden" name="e_id" value="{{ entry_id }}">
+		<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+	</form>
 {% endblock %}

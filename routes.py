@@ -133,7 +133,7 @@ def add_entry():
 		return render_template("error.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!")
     # Get the id of the corresponding activity
 	activity_id = int(request.form["id"])
-	entries.add_entry(activity_id, start_time, end_time)
+	entries.new(activity_id, start_time, end_time)
     # Return to main page
 	return redirect("/")
     
@@ -144,7 +144,27 @@ def edit_entry():
 	csrf_token = request.form["csrf_token"]
 	if not users.check(csrf_token) or not entries.owner(entry_id):
 		abort(403)
-	return render_template("edit-entry.html", entry_id=entry_id)
+	entry = entries.get_times(entry_id)
+	return render_template("edit-entry.html", entry_id=entry_id, entry=entry)
+	
+@app.route("/update-entry", methods=["POST"])
+def update_entry():
+	entry_id = request.form["e_id"]
+	csrf_token = request.form["csrf_token"]
+	if not users.check(csrf_token) or not entries.owner(entry_id):
+		abort(403)
+	# Get updated datetimes from the form
+	start_time = request.form["starttime"]
+	end_time = request.form["endtime"]
+    # Check validity of submitted datetimes
+	if start_time == "" or end_time == "":
+		return render_template("error.html", error="Suoritukselle täytyy valita aloitus- ja päättymisaika!")
+	if start_time >= end_time:
+		return render_template("error.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!")
+	entries.update(entry_id, start_time, end_time)
+		#TODO: Success message
+	return redirect("/")
+	
 
 @app.route("/delete-entry", methods=["POST"])
 def delete_entry():
