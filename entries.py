@@ -14,24 +14,23 @@ def add_entry(activity_id, start, end):
 	start_time = to_timestamp(start)
 	end_time = to_timestamp(end)
 	# Add entry to the database
-	sql = "INSERT INTO entries (activity_id, start, stop) values " \
+	try:
+		sql = "INSERT INTO entries (activity_id, start, stop) values " \
           "(:activity_id, :start_time, :end_time) RETURNING (stop - start) AS length"
-	result = db.session.execute(sql, {"activity_id":activity_id, "start_time":start_time, "end_time":end_time})
-	length = result.fetchone()[0]
-	# Update the totaltime of the activity
-	activities.update(activity_id, length, add=True)
+		result = db.session.execute(sql, {"activity_id":activity_id, "start_time":start_time, "end_time":end_time})
+		db.session.commit()
+		return True
+	except:
+		return False
 	
 def delete(entry_id, activity_id):
 	try:
 		sql = "DELETE FROM entries WHERE id=:entry_id RETURNING (stop - start) AS length"
 		result = db.session.execute(sql, {"entry_id":entry_id})
 		db.session.commit()
+		return True
 	except:
 		return False
-	# Update the totaltime of the activity
-	length = result.fetchone()[0]
-	activities.update(activity_id, length, add=False)
-	return True
 	
 def owner(entry_id):
 	user_id = users.user_id()
