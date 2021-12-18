@@ -1,6 +1,10 @@
-<h2>Uusi aktiviteetti</h2>
+{% extends "layout.html" %}
+{% block title %}Uusi aktiviteetti{% endblock %}
+{% block heading %}Uusi aktiviteetti{% endblock %}
+{% block info %}
 Tällä sivulla voit luoda uuden aktiviteetin, jota haluat seurata.
-<hr>
+{% endblock %}
+{% block content %}
 <form action="/create-activity" method="POST">
 	<p>Aktiviteetin nimi: <br>
 	<input type="text" name="name"></p>
@@ -16,4 +20,5 @@ Tällä sivulla voit luoda uuden aktiviteetin, jota haluat seurata.
 </form>
 <hr>
 <a href="/">Palaa etusivulle</a>
+{% endblock %}
 

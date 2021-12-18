@@ -1,17 +1,21 @@
-<h2> {{ activity_name }} </h2>
-<hr>
-<p>Suoritukset:</p>
-{% for entry in entries %}
-<p><b>{{ entry.date }}</b><br>
-{{ entry.start_time }} - {{ entry.end_time }} | <b>{{ entry.length }} min</b></p>
-<form action="/edit-entry" method="POST">
-	<input type="submit" value="Muokkaa">
-	<input type="hidden" name="a_name" value="{{ activity_name }}">
-	<input type="hidden" name="a_id" value="{{ activity_id }}">
-	<input type="hidden" name="e_id" value="{{ entry.id }}">
-	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-</form>
-<hr>
-{% endfor %}
+{% extends "layout.html" %}
+{% block title %}Aktiviteetti{% endblock %}
+{% block heading %}{{ activity_name }}{% endblock %}
+{% block info %}
+	Tällä sivulla näet aktiviteetille lisätyt suoritukset.
+{% endblock %}
+{% block content %}
+	{% for entry in entries %}
+		<p><b>{{ entry.date }}</b><br>
+		{{ entry.start_time }} - {{ entry.end_time }} | <b>{{ entry.length }} min</b></p>
+		<form action="/edit-entry" method="POST">
+			<input type="submit" value="Muokkaa">
+			<input type="hidden" name="a_name" value="{{ activity_name }}">
+			<input type="hidden" name="a_id" value="{{ activity_id }}">
+			<input type="hidden" name="e_id" value="{{ entry.id }}">
+			<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+		</form>
+	{% endfor %}
 <hr>
 <a href="/">Palaa etusivulle</a>
+{% endblock %}

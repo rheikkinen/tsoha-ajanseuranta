@@ -1,34 +1,37 @@
-{% if session.user_id %}
-<h2>Ajanseurantasovellus</h2>
-<a href="/new-category">Luo kategoria</a> <a href="/new-activity">Uusi aktiviteetti</a>
-{% for activity in activities %}
-<hr>
-{{ activity.name }}<br>
-{{ activity.total }} <br>
-<br>
-
-<form action="/activity/{{ activity.name }}" method="POST">
-	<input type="submit" value="Tiedot">
-	<input type="hidden" name="a_id" value="{{ activity.id }}">
-</form>
-<form action="/new-entry" method="POST">
-	<input type="submit" value="Lisää suoritus">
-	<input type="hidden" name="a_id" value="{{ activity.id }}">
-	<input type="hidden" name="a_name" value="{{ activity.name }}">
-</form>
-<hr>
-{% endfor %}
-<hr>
-<a href="/logout">Kirjaudu ulos</a>
-{% else %}
-<h2>Ajanseurantasovellus</h2>
-Kirjaudu sisään käyttääksesi sovellusta:<hr>
-<form action="/login" method="POST">
-	<p>Tunnus:<br>
-	<input type="text" name="username"></p>
-	<p>Salasana:<br>
-	<input type="password" name="password"></p>
-	<input type="submit" value="Kirjaudu sisään">
-</form>
-<p>Jos sinulla ei ole käyttäjätunnusta, voit luoda tunnuksen <a href="/new-user">täällä</a>.</p>
-{% endif %}
+{% extends "layout.html" %}
+{% block title %}Etusivu{% endblock %}
+{% block heading %}Etusivu{% endblock %}
+{% block content %}
+	{% if session.user_id %}
+		<a href="/new-category">Luo kategoria</a> <a href="/new-activity">Uusi aktiviteetti</a>
+		<!-- List all the user's activities -->
+		{% for activity in activities %}
+			<hr>
+			{{ activity.name }}<br>
+			{{ activity.total }}
+			<form action="/activity/{{ activity.name }}" method="POST">
+				<input type="submit" value="Tiedot">
+				<input type="hidden" name="a_id" value="{{ activity.id }}">
+			</form>
+			<form action="/new-entry" method="POST">
+				<input type="submit" value="Lisää suoritus">
+				<input type="hidden" name="a_id" value="{{ activity.id }}">
+				<input type="hidden" name="a_name" value="{{ activity.name }}">
+			</form>
+			<hr>
+		{% endfor %}
+		<hr>
+		<a href="/logout">Kirjaudu ulos</a>
+	<!--If the user is not logged in, show the login form-->
+	{% else %}
+		<p>Kirjaudu sisään käyttääksesi sovellusta:</p>
+		<form action="/login" method="POST">
+			<p>Tunnus:<br>
+			<input type="text" name="username"></p>
+			<p>Salasana:<br>
+			<input type="password" name="password"></p>
+			<input type="submit" value="Kirjaudu sisään">
+		</form>
+		<p>Jos sinulla ei ole käyttäjätunnusta, voit luoda tunnuksen <a href="/new-user">täällä</a>.</p>
+	{% endif %}
+{% endblock %}

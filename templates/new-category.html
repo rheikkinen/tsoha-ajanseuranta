@@ -1,7 +1,11 @@
-<title>Uusi kategoria</title>
+{% extends "layout.html" %}
+{% block title %}Luo kategoria{% endblock %}
+{% block heading %}Uuden kategorian luonti{% endblock %}
+{% block content %}
 <form action="/create-category", method="POST">
 	<p>Kategorian nimi:</p>
 	<input type="text" name="name">
 	<input type="submit" value="Luo">
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
+{% endblock %}
