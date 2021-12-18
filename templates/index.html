@@ -4,7 +4,7 @@
 {% for activity in activities %}
 <hr>
 {{ activity.name }}<br>
-{{ activity.totaltime }} <br>
+{{ activity.total }} <br>
 <br>
 
 <form action="/activity/{{ activity.name }}" method="POST">

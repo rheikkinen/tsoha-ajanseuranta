@@ -2,8 +2,11 @@ from db import db
 import users
 
 def get_list():
+	#TODO: intervals day, week, month
 	user_id = users.user_id()
-	sql = "SELECT id, name, totaltime FROM activities WHERE user_id=:user_id ORDER by totaltime DESC"
+	sql = "SELECT A.id, A.name, SUM(E.stop - E.start) AS total " \
+		  "FROM activities A LEFT JOIN entries E ON A.id=E.activity_id " \
+		  "WHERE A.user_id=:user_id GROUP BY A.id"
 	result = db.session.execute(sql, {"user_id":user_id})
 	return result.fetchall()
 	

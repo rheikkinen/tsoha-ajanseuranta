@@ -15,7 +15,6 @@ CREATE TABLE activities (
     category_id INTEGER REFERENCES categories,
     user_id INTEGER REFERENCES users,
     name TEXT,
-    totaltime INTERVAL
 );
 
 CREATE TABLE entries (
