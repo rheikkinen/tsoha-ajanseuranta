@@ -199,7 +199,6 @@ def update_entry():
 		entry = entries.get_times(entry_id)
 		return render_template("edit-entry.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!", entry_id=entry_id, entry=entry)
 	entries.update(entry_id, start_time, end_time)
-		#TODO: Success message
 	return redirect("/")
 	
 @app.route("/delete-entry", methods=["POST"])
@@ -210,5 +209,5 @@ def delete_entry():
 		abort(403)
 	activity_id = entries.activity_id(entry_id)
 	if not entries.delete(entry_id, activity_id):
-		return render_template("error.html", error="Suorituksen poistaminen ei onnistunut.")
+		return render_template("index.html", error="Suorituksen poistaminen ei onnistunut.")
 	return redirect("/")

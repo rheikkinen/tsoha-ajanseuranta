@@ -2,7 +2,6 @@ from db import db
 import users, categories
 
 def get_list():
-	#TODO: intervals day, week, month
 	user_id = users.user_id()
 	sql = "SELECT A.id, A.name, SUM(E.stop - E.start) AS total " \
 		  "FROM activities A LEFT JOIN entries E ON A.id=E.activity_id " \
