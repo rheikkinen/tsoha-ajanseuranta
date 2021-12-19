@@ -24,6 +24,9 @@
 		<a href="/logout">Kirjaudu ulos</a>
 	<!--If the user is not logged in, show the login form-->
 	{% else %}
+		{% if error %}
+			<p style="color:red">{{ error }}</p>
+		{% endif %}
 		<p>Kirjaudu sisään käyttääksesi sovellusta:</p>
 		<form action="/login" method="POST">
 			<p>Tunnus:<br>

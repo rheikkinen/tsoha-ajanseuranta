@@ -1,13 +1,23 @@
-<h2>Luo uusi tunnus</h2>
-Valitse itsellesi käyttäjätunnus ja salasana.
-<form action="/add-user" method="POST">
-<p><label>Tunnus:</label><br>
-<input type="text" name="username"></p>
-<p><label>Salasana:</label><br>
-<input type="password" name="password"></p>
-<p><label>Salasana uudestaan:</label><br>
-<input type="password" name="password_again"></p>
-<input type="submit" value="Luo tunnus">
-</form>
-<hr>
-<a href="/">Palaa etusivulle</a>
+{% extends "layout.html" %}
+{% block title %}Luo käyttäjätunnus{% endblock %}
+{% block heading %}Luo uusi tunnus{% endblock %}
+{% block content %}
+	{% if error %}
+		<p style="color:red">{{ error }}</p>
+	{% endif %}
+	{% for error in errors %}
+		<p style="color:red">{{ error }}</p>
+	{% endfor %}
+	Valitse itsellesi käyttäjätunnus ja salasana.
+	<form action="/add-user" method="POST">
+	<p><label>Tunnus:</label><br>
+		<input type="text" name="username" value="{{ username }}"></p>
+		<p><label>Salasana:</label><br>
+		<input type="password" name="password"></p>
+		<p><label>Salasana uudestaan:</label><br>
+		<input type="password" name="password_again"></p>
+		<input type="submit" value="Luo tunnus">
+	</form>
+	<hr>
+	<a href="/">Palaa etusivulle</a>
+{% endblock %}

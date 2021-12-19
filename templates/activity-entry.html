@@ -2,13 +2,16 @@
 {% block title %}Lisää suoritus{% endblock %}
 {% block heading %}Uusi suoritus{% endblock %}
 {% block content %}
-<h2> {{ name }} </h2>
+<h3> {{ name }} </h3>
+{% if error %}
+	<p style="color:red">{{ error }}</p>
+{% endif %}
 <form action="/add-entry" method="POST">
 	<p>Valitse suorituksen alkamis- ja päättymisaika.</p>
-	<p>Start: <input type="datetime-local" name="starttime" min="2021-10-01T00:00"></p>
-	<p>End: <input type="datetime-local" name="endtime"></p>
+	<p>Start: <input type="datetime-local" name="starttime" value="{{ start }}" min="2021-10-01T00:00"></p>
+	<p>End: <input type="datetime-local" name="endtime" value="{{ end }}"></p>
 	<input type="submit" value="Lisää suoritus">
-	<input type="hidden" name="id" value="{{ activity_id }}">
+	<input type="hidden" name="a_id" value="{{ activity_id }}">
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 <hr>

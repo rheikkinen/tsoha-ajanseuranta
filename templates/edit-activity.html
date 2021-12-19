@@ -2,6 +2,9 @@
 {% block title %}Muokkaa aktiviteettia{% endblock %}
 {% block heading %}Aktiviteetin muokkaus{% endblock %}
 {% block content %}
+{% if error %}
+	<p style="color:red">{{ error }}</p>
+{% endif %}
 <form action="/update-activity" method="POST">
 	<p>Aktiviteetin nimi: <br>
 	<input type="text" value="{{ current_name }}" name="new_name"></p>

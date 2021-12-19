@@ -5,6 +5,9 @@
 Tällä sivulla voit luoda uuden aktiviteetin, jota haluat seurata.
 {% endblock %}
 {% block content %}
+{% if error %}
+	<p style="color:red">{{ error }}</p>
+{% endif %}
 <form action="/create-activity" method="POST">
 	<p>Aktiviteetin nimi: <br>
 	<input type="text" name="name"></p>

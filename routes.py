@@ -12,8 +12,7 @@ def login():
 	username = request.form["username"]
 	password = request.form["password"]
 	if not users.login(username, password):
-		return render_template("error.html", error="Syöttämäsi tunnus tai salasana on väärin.")
-    # If login succeeded, return to main page
+		return render_template("index.html", error="Syöttämäsi tunnus tai salasana on väärin.")
 	return redirect("/")
 
 @app.route("/logout")
@@ -31,21 +30,25 @@ def add_user():
 	username = request.form["username"]
 	password = request.form["password"]
 	password2 = request.form["password_again"]
+	errors = []
     # Check validity of the submitted username and password(s)
 	if username == "" or password == "":
-		return render_template("error.html", error="Käyttäjätunnus ja salasana eivät saa olla tyhjät.")
+		return render_template("new-user.html", error="Käyttäjätunnus ja salasana eivät saa olla tyhjät.", username=username)
 	if len(username) > 50:
-		return render_template("error.html", error="Käyttäjätunnus on liian pitkä! (Max 50 merkkiä)")
-	if len(password) < 6:
-		return render_template("error.html", error="Salasanassa on oltava vähintään 6 merkkiä.")
-	if len(password) > 100:
-		return render_template("error.html", error="Salasana on liian pitkä.")
+		errors.append("Käyttäjätunnus on liian pitkä! (Max 50 merkkiä)")
+		#return render_template("error.html", error="Käyttäjätunnus on liian pitkä! (Max 50 merkkiä)")
+	if len(password) < 6 or len(password) > 100:
+		errors.append("Salasanassa on oltava vähintään 6 ja enintään 100 merkkiä.")
+		#return render_template("error.html", error="Salasanassa on oltava vähintään 6 merkkiä.")
 	if password != password2:
-		return render_template("error.html", error="Salasanat eivät täsmää!")
+		errors.append("Salasanat eivät täsmää.")
+		#return render_template("error.html", error="Salasanat eivät täsmää!")
+	if len(errors) >= 1:
+		return render_template("new-user.html", errors=errors, username=username)
 	if users.register(username, password):
 		return redirect("/")
 	else:
-		return render_template("error.html", error="Käyttäjätilin luominen ei onnistunut.")
+		return render_template("new-user.html", error="Käyttäjätilin luominen ei onnistunut.")
 
 @app.route("/new-category")
 def new_category():
@@ -63,8 +66,7 @@ def create_category():
 		abort(403)
 	name = request.form["name"]
 	if len(name) > 30 or name == "":
-		# TODO: error message
-		pass
+		return render_template("new-category.html", error="Nimessä on oltava vähintään 1 ja enintään 30 merkkiä.")
 	categories.create(name)
 	return redirect("/")
 	
@@ -86,7 +88,7 @@ def create_activity():
 	# Get the name of the activity from the form    
 	name = request.form["name"]
 	if len(name) > 30 or name == "":
-		return render_template("error.html", error="Aktiviteetin nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä.")
+		return render_template("new-activity.html", error="Nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä.")
 	category_id = request.form["category"]
 	if category_id == "default":
 		activities.create(name, 0)
@@ -130,7 +132,12 @@ def update_activity():
 		abort(403)
 	new_name = request.form["new_name"]
 	if len(new_name) > 30 or new_name == "":
-		return render_template("error.html", error="Aktiviteetin nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä.")
+		# Get list of user's categories
+		list = categories.get_list()
+		# Get the current category of the activity
+		category = activities.get_category(activity_id)
+		error = "Aktiviteetin nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä."
+		return render_template("edit-activity.html", error=error, activity_id=activity_id, current_name=new_name, categories=list, current_category=category)
 	category_id = request.form["category"]
 	if not activities.update(activity_id, new_name, int(category_id)):
 		return redirect("/")
@@ -151,16 +158,16 @@ def activity_entry():
 def add_entry():
 	if not users.check(request.form["csrf_token"]):
 		abort(403)
+	# Get the id of the corresponding activity
+	activity_id = int(request.form["a_id"])
     # Get datetimes from the form
 	start_time = request.form["starttime"]
 	end_time = request.form["endtime"]
     # Check validity of submitted datetimes
 	if start_time == "" or end_time == "":
-		return render_template("error.html", error="Suoritukselle täytyy valita aloitus- ja päättymisaika!")
+		return render_template("activity-entry.html", error="Suoritukselle täytyy valita aloitus- ja päättymisaika!", activity_id=activity_id)
 	if start_time >= end_time:
-		return render_template("error.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!")
-    # Get the id of the corresponding activity
-	activity_id = int(request.form["id"])
+		return render_template("activity-entry.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!", start=start_time, end=end_time, activity_id=activity_id)
 	entries.new(activity_id, start_time, end_time)
     # Return to main page
 	return redirect("/")
@@ -186,9 +193,11 @@ def update_entry():
 	end_time = request.form["endtime"]
     # Check validity of submitted datetimes
 	if start_time == "" or end_time == "":
-		return render_template("error.html", error="Suoritukselle täytyy valita aloitus- ja päättymisaika!")
+		entry = entries.get_times(entry_id)
+		return render_template("edit-entry.html", error="Suoritukselle täytyy valita aloitus- ja päättymisaika!", entry_id=entry_id, entry=entry)
 	if start_time >= end_time:
-		return render_template("error.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!")
+		entry = entries.get_times(entry_id)
+		return render_template("edit-entry.html", error="Suorituksen aloitusajan täytyy olla ennen päättymisaikaa!", entry_id=entry_id, entry=entry)
 	entries.update(entry_id, start_time, end_time)
 		#TODO: Success message
 	return redirect("/")

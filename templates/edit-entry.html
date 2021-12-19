@@ -5,6 +5,9 @@
 Voit muuttaa suorituksen aloitus- ja päättymisaikaa tai poistaa suorituksen.
 {% endblock %}
 {% block content %}
+{% if error %}
+	<p style="color:red">{{ error }}</p>
+{% endif %}
 <p>Muokkaa aikoja:</p>
 	<form action="/update-entry" method="POST">
 		<p>Start: <input type="datetime-local" name="starttime" value="{{ entry.start_time }}" min="2021-10-01T00:00"></p>

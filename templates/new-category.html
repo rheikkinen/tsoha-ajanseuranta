@@ -2,6 +2,9 @@
 {% block title %}Luo kategoria{% endblock %}
 {% block heading %}Uuden kategorian luonti{% endblock %}
 {% block content %}
+{% if error %}
+	<p style="color:red">{{ error }}</p>
+{% endif %}
 <form action="/create-category", method="POST">
 	<p>Kategorian nimi:</p>
 	<input type="text" name="name">
