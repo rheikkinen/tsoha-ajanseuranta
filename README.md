@@ -15,6 +15,7 @@ Sovellusta voi testata [Herokussa](https://tsoha-ajanseuranta.herokuapp.com/).
 * Käyttäjä voi tarkastella, muokata ja poistaa aktiviteetille lisättyjä suorituksia
 
 ### Ideoita sovelluksen jatkokehitykseen
+Sovellus jäi valitettavasti melko keskeneräiseksi, eikä sitä tällaisenaan olisi kovin mielekästä käyttää.
 Tässä on listattuna joitakin ominaisuuksia ja kehitysideoita, jotka sovellukseen oli suunniteltu mutta jotka jäivät kurssin ajan puitteissa toteuttamatta.
 * Käyttäjä voi poistaa kategorioita ja aktiviteetteja
 * Käyttäjä voi tarkastella ajankäytöstään koostettuja yhteenvetoja
