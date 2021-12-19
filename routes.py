@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, request, redirect, abort, flash
+from flask import render_template, request, redirect, abort
 import users, categories, activities, entries
 
 @app.route("/")
