@@ -31,8 +31,12 @@ def update(activity_id, new_name, category_id):
 		if not current_category and category_id == 0:
 			return False
 	# Change the name and/or the category of an existing activity
-	sql = "UPDATE activities SET name = :new_name, category_id = :category_id WHERE id=:activity_id"
-	result = db.session.execute(sql, {"new_name":new_name, "activity_id":activity_id, "category_id":category_id})
+	if category_id == 0:
+		sql = "UPDATE activities SET name = :new_name, category_id = null WHERE id=:activity_id"
+		result = db.session.execute(sql, {"new_name":new_name, "activity_id":activity_id})
+	else:
+		sql = "UPDATE activities SET name = :new_name, category_id = :category_id WHERE id=:activity_id"
+		result = db.session.execute(sql, {"new_name":new_name, "activity_id":activity_id, "category_id":category_id})
 	db.session.commit()
 	return True
     

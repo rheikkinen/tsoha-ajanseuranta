@@ -132,7 +132,7 @@ def update_activity():
 	if len(new_name) > 30 or new_name == "":
 		return render_template("error.html", error="Aktiviteetin nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä.")
 	category_id = request.form["category"]
-	if not activities.update(activity_id, new_name, category_id):
+	if not activities.update(activity_id, new_name, int(category_id)):
 		return redirect("/")
 	return redirect("/")
 		

@@ -19,6 +19,8 @@ def get_list():
 	return result.fetchall()
 	
 def owner(category_id):
+	if int(category_id) == 0:
+		return True
 	user_id = users.user_id()
 	# Check that the logged-in user is the owner of the category
 	sql = "SELECT user_id FROM categories WHERE id=:category_id"
