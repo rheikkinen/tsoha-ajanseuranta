@@ -17,3 +17,14 @@ def get_list():
 	sql = "SELECT id, name FROM categories WHERE user_id=:user_id"
 	result = db.session.execute(sql, {"user_id":user_id})
 	return result.fetchall()
+	
+def owner(category_id):
+	user_id = users.user_id()
+	# Check that the logged-in user is the owner of the category
+	sql = "SELECT user_id FROM categories WHERE id=:category_id"
+	result = db.session.execute(sql, {"category_id":category_id})
+	try:
+		owner_id = result.fetchone()[0]
+	except:
+		return False
+	return user_id == owner_id

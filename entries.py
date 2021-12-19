@@ -55,7 +55,10 @@ def owner(entry_id):
 	user_id = users.user_id()
 	sql = "SELECT user_id FROM activities A JOIN entries E ON E.activity_id=A.id WHERE E.id=:entry_id"
 	result = db.session.execute(sql, {"entry_id":entry_id})
-	owner_id = result.fetchone()[0]
+	try:
+		owner_id = result.fetchone()[0]
+	except:
+		return False
 	return user_id == owner_id
 	
 def activity_id(entry_id):

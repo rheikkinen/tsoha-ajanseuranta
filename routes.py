@@ -96,7 +96,7 @@ def create_activity():
     
 # Route for the activity's info page
 @app.route("/activity/<activity_name>", methods=["POST", "GET"])
-def show_info(activity_name):
+def show_activity(activity_name):
 	if request.method == "POST":
 		activity_id = request.form["a_id"]
 		# Check that the user is the owner of the activity
@@ -108,7 +108,35 @@ def show_info(activity_name):
 	else:
 		return redirect("/")
 
-# Route for the form where the user can add a time entry for a particular activity
+# Route for the page where user can edit an existing activity
+@app.route("/edit-activity", methods=["POST"])
+def edit_activity():
+	activity_id = request.form["a_id"]
+	csrf_token = request.form["csrf_token"]
+	if not users.check(csrf_token) or not activities.owner(activity_id):
+		abort(403)
+	name = request.form["a_name"]
+	# Get list of user's categories
+	list = categories.get_list()
+	# Get the current category of the activity
+	category = activities.get_category(activity_id)
+	return render_template("edit-activity.html", activity_id=activity_id, current_name=name, categories=list, current_category=category)
+	
+@app.route("/update-activity", methods=["POST"])
+def update_activity():
+	csrf_token = request.form["csrf_token"]
+	activity_id = request.form["a_id"]
+	if not users.check(csrf_token) or not activities.owner(activity_id):
+		abort(403)
+	new_name = request.form["new_name"]
+	if len(new_name) > 30 or new_name == "":
+		return render_template("error.html", error="Aktiviteetin nimessä on oltava vähintään 1 merkki ja enintään 30 merkkiä.")
+	category_id = request.form["category"]
+	if not activities.update(activity_id, new_name, category_id):
+		return redirect("/")
+	return redirect("/")
+		
+# Route for the form where the user can add a time entry for the activity
 @app.route("/new-entry", methods=["POST", "GET"])
 def activity_entry():
 	# Login check
@@ -165,7 +193,6 @@ def update_entry():
 		#TODO: Success message
 	return redirect("/")
 	
-
 @app.route("/delete-entry", methods=["POST"])
 def delete_entry():
 	entry_id = request.form["e_id"]

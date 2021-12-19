@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Muokkaa aktiviteettia{% endblock %}
+{% block heading %}Aktiviteetin muokkaus{% endblock %}
+{% block content %}
+<form action="/update-activity" method="POST">
+	<p>Aktiviteetin nimi: <br>
+	<input type="text" value="{{ current_name }}" name="new_name"></p>
+	<p>Kategoria: <br>
+	<select name="category">
+		{% if not current_category %}
+			<option value="0" selected>Ei kategoriaa</option>
+		{% else %}
+			<option value="0">Ei kategoriaa</option>
+		{% endif %}
+		{% for category in categories %}
+			{% if current_category.id == category.id %}
+				<option value="{{ category.id }}" selected>{{ category.name }}</option>
+			{% else %}
+				<option value="{{ category.id }}">{{ category.name }}</option>
+			{% endif %}
+		{% endfor %}</p>
+	</select>
+	<p><input type="submit" value="Tallenna"></p>
+	<input type="hidden" name="a_id" value="{{ activity_id }}">
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+<hr>
+<a href="/">Palaa etusivulle</a>
+{% endblock %}
+
